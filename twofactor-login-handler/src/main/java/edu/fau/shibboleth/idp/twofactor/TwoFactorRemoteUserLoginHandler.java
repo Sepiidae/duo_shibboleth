@@ -82,8 +82,6 @@ public class TwoFactorRemoteUserLoginHandler extends AbstractLoginHandler {
 
             String authnServletUrl = HttpServletHelper.getContextRelativeUrl(httpRequest, authenticationServletPath)
                     .buildURL();
-            
-            //String profileUrl = HttpServletHelper.getContextRelativeUrl(httpRequest, servletURL).buildURL();
 
             log.debug("Redirecting to {}", authnServletUrl);
             httpResponse.sendRedirect(authnServletUrl);
