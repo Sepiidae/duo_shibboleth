@@ -133,6 +133,7 @@ public class TwoFactorRemoteUserAuthServlet extends HttpServlet {
 
         if (duoResponse != null) {
             // We have a Duo response, verify it.
+            log.debug( "We have a Duo response, verify it");
             String ikey = (String) request.getSession().getAttribute(IKEY_KEY);
             String skey = (String) request.getSession().getAttribute(SKEY_KEY);
             String akey = (String) request.getSession().getAttribute(AKEY_KEY);
@@ -157,12 +158,13 @@ public class TwoFactorRemoteUserAuthServlet extends HttpServlet {
                     request.setAttribute(LoginHandler.SUBJECT_KEY, userSubject);
                     request.setAttribute(LoginHandler.AUTHENTICATION_METHOD_KEY, authenticationMethod);
                     request.getSession().removeAttribute(USER_SUBJECT_KEY);
+                    log.debug( "Return to authentication engine");
                     AuthenticationEngine.returnToAuthenticationEngine(request, response);
                     return;
                 }
             }
             // Something was fake, expired, or not matching.
-             AuthenticationEngine.returnToAuthenticationEngine(request, response);
+            //AuthenticationEngine.returnToAuthenticationEngine(request, response);
             return;
         } else if (username == null) {
             // We don't have Duo response or user, first interaction.
@@ -171,8 +173,8 @@ public class TwoFactorRemoteUserAuthServlet extends HttpServlet {
             log.debug("Remote user identified as {} returning control back to authentication engine", principalName);
             request.setAttribute(LoginHandler.PRINCIPAL_KEY, new UsernamePrincipal(principalName));
             request.setAttribute(LoginHandler.AUTHENTICATION_METHOD_KEY, authenticationMethod);
-
-             return;
+            AuthenticationEngine.returnToAuthenticationEngine(request, response);
+            return;
 
         } else {
             // We don't have a Duo response, we do have user/pass.
@@ -184,6 +186,7 @@ public class TwoFactorRemoteUserAuthServlet extends HttpServlet {
             String host = (String) request.getSession().getAttribute(HOST_KEY);
             // Remove Duo attributes, just in case the session will persist.
             request.getSession().removeAttribute(HOST_KEY);
+            log.debug("Remote user identified as {} redirecting to duo", principalName);
 
             request.setAttribute("host", host);
             String sigRequest = DuoWeb.signRequest(ikey, skey, akey, username);
