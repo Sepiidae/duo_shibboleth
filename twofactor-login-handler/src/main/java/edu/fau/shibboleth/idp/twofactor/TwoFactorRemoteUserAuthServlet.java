@@ -171,15 +171,15 @@ public class TwoFactorRemoteUserAuthServlet extends HttpServlet {
             // let servlet run
 
             log.debug("Remote user identified as {} returning control back to authentication engine", principalName);
-            request.setAttribute(LoginHandler.PRINCIPAL_KEY, new UsernamePrincipal(principalName));
-            request.setAttribute(LoginHandler.AUTHENTICATION_METHOD_KEY, authenticationMethod);
             AuthenticationEngine.returnToAuthenticationEngine(request, response);
             return;
 
         } else {
             // We don't have a Duo response, we do have user/pass.
             // Send to Duo page only after verifying user/pass.
-
+            request.setAttribute(LoginHandler.PRINCIPAL_KEY, new UsernamePrincipal(principalName));
+            request.setAttribute(LoginHandler.AUTHENTICATION_METHOD_KEY, authenticationMethod);
+        
             String ikey = (String) request.getSession().getAttribute(IKEY_KEY);
             String skey = (String) request.getSession().getAttribute(SKEY_KEY);
             String akey = (String) request.getSession().getAttribute(AKEY_KEY);
