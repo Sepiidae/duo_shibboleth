@@ -86,5 +86,15 @@ public class TwoFactorLoginHandlerBeanDefinitionParser extends AbstractLoginHand
         String host = DatatypeHelper.safeTrim(config.getAttributeNS(null, "host"));
         log.debug("Setting Duo host to: {}", host);
         builder.addPropertyValue("host", host);
+        
+        
+        boolean remoteUser = false;
+        String sRemoteUser =  DatatypeHelper.safeTrim(config.getAttributeNS(null, "remoteUser"));
+        if( sRemoteUser != null ) {
+            remoteUser = Boolean.parseBoolean(sRemoteUser);
+        }
+        
+        log.debug("Setting remoteUser to: {}", remoteUser);
+        builder.addPropertyValue("remoteUser", remoteUser);
     }
 }

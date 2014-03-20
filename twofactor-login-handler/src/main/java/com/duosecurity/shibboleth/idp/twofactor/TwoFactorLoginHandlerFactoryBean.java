@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
 /* Copyright 2012 Duo Security Inc.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,23 +27,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
-
+ */
 package com.duosecurity.shibboleth.idp.twofactor;
 
+import edu.fau.shibboleth.idp.twofactor.TwoFactorRemoteUserLoginHandler;
+import edu.internet2.middleware.shibboleth.idp.authn.provider.AbstractLoginHandler;
 import edu.internet2.middleware.shibboleth.idp.config.profile.authn.AbstractLoginHandlerFactoryBean;
 
 /**
  * Factory bean for {@link TwoFactorLoginHandler}s.
  */
-public class TwoFactorLoginHandlerFactoryBean extends AbstractLoginHandlerFactoryBean{
+public class TwoFactorLoginHandlerFactoryBean extends AbstractLoginHandlerFactoryBean {
 
-    /** URL to authentication servlet. */
+    /**
+     * URL to authentication servlet.
+     */
     private String authenticationServletURL;
 
     /**
      * Gets the URL to authentication servlet.
-     * 
+     *
      * @return URL to authentication servlet
      */
     public String getAuthenticationServletURL() {
@@ -53,55 +55,81 @@ public class TwoFactorLoginHandlerFactoryBean extends AbstractLoginHandlerFactor
 
     /**
      * Sets URL to authentication servlet.
-     * 
+     *
      * @param url URL to authentication servlet
      */
     public void setAuthenticationServletURL(String url) {
         authenticationServletURL = url;
     }
-
     // Duo attributes
     private String skey = null;
     private String ikey = null;
     private String akey = null;
     private String host = null;
+    private boolean remoteUser = false;
 
     // Duo attribute getter/setters
-    public String getSkey(){
+    public String getSkey() {
         return skey;
     }
-    public void setSkey(String s){
+
+    public void setSkey(String s) {
         skey = s;
     }
-    public String getIkey(){
+
+    public String getIkey() {
         return ikey;
     }
-    public void setIkey(String s){
+
+    public void setIkey(String s) {
         ikey = s;
     }
-    public String getAkey(){
+
+    public String getAkey() {
         return akey;
     }
-    public void setAkey(String s){
+
+    public void setAkey(String s) {
         akey = s;
     }
-    public String getHost(){
+
+    public String getHost() {
         return host;
     }
-    public void setHost(String s){
+
+    public void setHost(String s) {
         host = s;
     }
 
-    /** {@inheritDoc} */
+    public boolean getRemoteUser() {
+        return remoteUser;
+    }
+
+    public void setRemoteUser(boolean remoteUser) {
+        this.remoteUser = remoteUser;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected Object createInstance() throws Exception {
-        TwoFactorLoginHandler handler = new TwoFactorLoginHandler(authenticationServletURL, skey, ikey, akey, host);
+        AbstractLoginHandler handler;
+        if (remoteUser) {
+            handler = new TwoFactorRemoteUserLoginHandler(authenticationServletURL, skey, ikey, akey, host);
+        } else {
+            handler = new TwoFactorLoginHandler(authenticationServletURL, skey, ikey, akey, host);
+        }
+
+
 
         populateHandler(handler);
 
         return handler;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public Class getObjectType() {
         return TwoFactorLoginHandler.class;
     }
