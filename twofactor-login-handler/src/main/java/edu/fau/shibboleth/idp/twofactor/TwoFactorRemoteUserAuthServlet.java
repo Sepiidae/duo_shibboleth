@@ -122,7 +122,7 @@ public class TwoFactorRemoteUserAuthServlet extends HttpServlet {
             IOException {
 
         String principalName = DatatypeHelper.safeTrimOrNullString(request.getRemoteUser());
-
+        log.debug( "Principal name from remote service is {} ", principalName );
         String username = principalName;
 
         String duoResponse = request.getParameter(duoResponseAttribute);
@@ -142,27 +142,21 @@ public class TwoFactorRemoteUserAuthServlet extends HttpServlet {
             request.getSession().removeAttribute(IKEY_KEY);
             request.getSession().removeAttribute(AKEY_KEY);
 
+            
+            
             String duoUsername = DuoWeb.verifyResponse(ikey, skey, akey, duoResponse);
             // Get the subject we stored in the session after authentication.
-            Subject userSubject = (Subject) request.getSession().getAttribute(USER_SUBJECT_KEY);
-            // Set authentication attributes if we find a principal
-            // matching the Duo username; assume we were the only ones to
-            // add a UsernamePrincpal.
-            Set<UsernamePrincipal> principals = userSubject.getPrincipals(UsernamePrincipal.class);
-            Iterator iter = principals.iterator();
-            while (iter.hasNext()) {
-                UsernamePrincipal principal = (UsernamePrincipal) iter.next();
-                if (duoUsername.equals(principal.getName())) {
+           
+              
+                if (duoUsername.equals(principalName)) {
                     // Duo username matches the one we locally authed with,
                     // user is legit.
-                    request.setAttribute(LoginHandler.SUBJECT_KEY, userSubject);
                     request.setAttribute(LoginHandler.AUTHENTICATION_METHOD_KEY, authenticationMethod);
-                    request.getSession().removeAttribute(USER_SUBJECT_KEY);
+              
                     log.debug( "Return to authentication engine");
                     AuthenticationEngine.returnToAuthenticationEngine(request, response);
                     return;
                 }
-            }
             // Something was fake, expired, or not matching.
             //AuthenticationEngine.returnToAuthenticationEngine(request, response);
             return;
@@ -171,7 +165,7 @@ public class TwoFactorRemoteUserAuthServlet extends HttpServlet {
             // let servlet run
 
             log.debug("Remote user identified as {} returning control back to authentication engine", principalName);
-            AuthenticationEngine.returnToAuthenticationEngine(request, response);
+            // AuthenticationEngine.returnToAuthenticationEngine(request, response);
             return;
 
         } else {
@@ -186,7 +180,7 @@ public class TwoFactorRemoteUserAuthServlet extends HttpServlet {
             String host = (String) request.getSession().getAttribute(HOST_KEY);
             // Remove Duo attributes, just in case the session will persist.
             request.getSession().removeAttribute(HOST_KEY);
-            log.debug("Remote user identified as {} redirecting to duo", principalName);
+            log.debug("Remote user identified as {} signing duo request", principalName);
 
             request.setAttribute("host", host);
             String sigRequest = DuoWeb.signRequest(ikey, skey, akey, username);
