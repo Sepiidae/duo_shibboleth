@@ -152,8 +152,9 @@ public class TwoFactorRemoteUserAuthServlet extends HttpServlet {
                 if (duoUsername.equals(principalName)) {
                     // Duo username matches the one we locally authed with,
                     // user is legit.
+                    request.setAttribute(LoginHandler.PRINCIPAL_KEY, new UsernamePrincipal(principalName));
                     request.setAttribute(LoginHandler.AUTHENTICATION_METHOD_KEY, authenticationMethod);
-              
+       
                     log.debug( "Return to authentication engine");
                     AuthenticationEngine.returnToAuthenticationEngine(request, response);
                     return;
