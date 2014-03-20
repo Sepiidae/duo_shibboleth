@@ -147,7 +147,8 @@ public class TwoFactorRemoteUserAuthServlet extends HttpServlet {
             String duoUsername = DuoWeb.verifyResponse(ikey, skey, akey, duoResponse);
             // Get the subject we stored in the session after authentication.
            
-              
+                          log.debug( "We have a Duo response, got {} and it should be for {}", duoUsername, principalName);
+
                 if (duoUsername.equals(principalName)) {
                     // Duo username matches the one we locally authed with,
                     // user is legit.
